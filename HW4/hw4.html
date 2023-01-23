@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>HW4 Form</title>
+        <link rel="stylesheet" href="./hw4.css" />
+        <script src="./hw4.js"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300&family=Pacifico&family=Quicksand:wght@300;400&family=Rubik+Bubbles&display=swap"
+            rel="stylesheet"
+        />
+        <script>
+             function trigger() {
+                document.getElementById("validation").innerHTML=""
+                let loopinputs = document.getElementsByName("input");
+                let looplabels = document.getElementsByTagName("label");
+                console.log(loopinputs)
+                console.log(looplabels)
+                for (var i = 0; i < loopinputs.length; i++) {
+                    validator.isNonEmpty(loopinputs[i].value);
+                    if(validator.isValid()===false){
+                            document.getElementById("validation").innerHTML += "The value for "  + looplabels[i].textContent + " is empty. Please fill it out! <br />"
+                        }
+                    
+                    if (loopinputs[i].getAttribute('id') === "email" && validator.isValid()===true) {
+                        validator.isValidEmail(loopinputs[i].value);
+                        if(validator.isValid()===false){
+                            document.getElementById("validation").innerHTML += "The email you entered was not valid. <br />"
+                        }
+                    }
+                    if (loopinputs[i].type === "number" && validator.isValid()===true) {
+                        validator.isPositiveInteger(
+                            Number(loopinputs[i].value)
+                        );
+                        if(validator.isValid()===false){
+                            document.getElementById("validation").innerHTML += "The number you entered was not a positive integer. <br />"
+                        }
+                    }
+                }
+            };
+            const validator = (function () {
+                // ...
+                let isValid = true;
+                return {
+                    isNumeric: function (text) {
+                        if (typeof text !== "number") {
+                            isValid = false;
+                        }
+                    },
+                    isInteger: function (text) {
+                        /* ... */
+                        if (
+                            typeof text === "number" &&
+                            text !== Math.floor(text)
+                        ) {
+                            return (isValid = true);
+                        } else {
+                            isValid = false;
+                        }
+                    },
+                    isNegativeInteger: function (text) {
+                        /* ... */
+                        if (
+                            typeof text === "number" &&
+                            text === Math.floor(text) &&
+                            text < 0
+                        ) {
+                            return (isValid = true);
+                        } else {
+                            isValid = false;
+                        }
+                    },
+                    isPositiveInteger: function (text) {
+                        /* ... */
+                        if (
+                            typeof text === "number" &&
+                            text === Math.floor(text) &&
+                            text > 0
+                        ) {
+                            return (isValid = true);
+                        } else {
+                            isValid = false;
+                        }
+                    },
+                    isNonNegativeInteger: function (text) {
+                        /* ... */
+                        if (
+                            typeof text === "number" &&
+                            text === Math.floor(text) &&
+                            text >= 0
+                        ) {
+                            return (isValid = true);
+                        } else {
+                            isValid = false;
+                        }
+                    },
+                    isInRange: function (text, m, n) {
+                        /* ... */
+                        if (typeof text !== "number") {
+                            isValid = false;
+                            return;
+                        }
+                        if (m && n && m < n && text >= m && text <= n) {
+                            return (isValid = true);
+                        }
+
+                        if (m && !n && text >= m) {
+                            return (isValid = true);
+                        } else {
+                            isValid = false;
+                        }
+                    },
+                    isValidEmail: function (text) {
+                        /* ... */
+                        let emailFormat =
+                            /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
+                        if (text.match(emailFormat)) {
+                            return (isValid = true);
+                        } else {
+                            isValid = false;
+                        }
+                    },
+                    isNonEmpty: function (text) {
+                        /* ... */
+                        if (!text) {
+                            isValid = false;
+                        }
+                        else{
+                            isValid=true;
+                        }
+                    },
+                    matchesRegex: function (text, regex) {
+                        /* ... */
+
+                        let regexFormat = regex;
+
+                        if (text.match(regexFormat)) {
+                            return (isValid = true);
+                        } else {
+                            isValid = false;
+                        }
+                    },
+                    lengthIsInRange: function (text, m, n) {
+                        /* ... */
+                        if (typeof text !== "string") {
+                            isValid = false;
+                            return;
+                        }
+                        if (
+                            m &&
+                            n &&
+                            m < n &&
+                            text.length >= m &&
+                            text.length <= n
+                        ) {
+                            return (isValid = true);
+                        }
+
+                        if (m && !n && text.length >= m) {
+                            return (isValid = true);
+                        } else {
+                            isValid = false;
+                        }
+                    },
+                    isValid: function () {
+                        /* ... */
+                        return isValid;
+                    },
+                    reset: function () {
+                        /* ... */
+                        isValid = true;
+                    },
+                };
+            })();
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <div id="validation" class="red"></div>
+            <form action="">
+                <label for="name">Full Name </label><span class="red">*</span>
+                <input id="name" name="input" type="text" />
+                <label for="email">Email </label><span class="red">*</span>
+                <input id="email" name="input" type="text" />
+                <label for="book"
+                    >Favorite Book </label
+                ><span class="red">*</span>
+                <input id="book" name="input" type="text" />
+                <label for="checknumber">Positive Integer to Check</label><span class="red">*</span>
+                <input id="checknumber" name="input" type="number" />
+                <input type="button" onclick="trigger()" value="Submit Contact Info"></input>
+            </form>
+        </div>
+    </body>
+</html>

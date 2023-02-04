@@ -32,7 +32,7 @@
                             document.getElementById("validation").innerHTML += "The email you entered was not valid. <br />"
                         }
                     }
-                    if (loopinputs[i].type === "number" && validator.isValid()===true) {
+                    if (loopinputs[i].getAttribute('id') === "positivenumber"&& validator.isValid()===true) {
                         validator.isPositiveInteger(
                             Number(loopinputs[i].value)
                         );
@@ -40,6 +40,23 @@
                             document.getElementById("validation").innerHTML += "The number you entered was not a positive integer. <br />"
                         }
                     }
+                    if (loopinputs[i].getAttribute('id') === "negativenumber"&& validator.isValid()===true) {
+                        validator.isNegativeInteger(
+                            Number(loopinputs[i].value)
+                        );
+                        if(validator.isValid()===false){
+                            document.getElementById("validation").innerHTML += "The number you entered was not a negative integer. <br />"
+                        }
+                    }
+                }
+                if(document.getElementById("validation").innerHTML==="")
+                {
+                    for (var i = 0; i < loopinputs.length; i++) {
+                        loopinputs[i].value='';
+                    }
+
+                    alert("Your inputs were all valid!")
+
                 }
             };
             const validator = (function () {
@@ -118,15 +135,16 @@
                         /* ... */
                         let emailFormat =
                             /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
-                        if (text.match(emailFormat)) {
+                        if (typeof text==="string" && text.match(emailFormat)) {
                             return (isValid = true);
                         } else {
                             isValid = false;
                         }
                     },
+                    
                     isNonEmpty: function (text) {
                         /* ... */
-                        if (!text) {
+                        if (!text || text==="undefined") {
                             isValid = false;
                         }
                         else{
@@ -190,9 +208,11 @@
                     >Favorite Book </label
                 ><span class="red">*</span>
                 <input id="book" name="input" type="text" />
-                <label for="checknumber">Positive Integer to Check</label><span class="red">*</span>
-                <input id="checknumber" name="input" type="number" />
-                <input type="button" onclick="trigger()" value="Submit Contact Info"></input>
+                <label for="positivenumber">Positive Integer to Check</label><span class="red">*</span>
+                <input id="positivenumber" name="input" type="number" />
+                <label for="negativenumber">Negative Integer to Check</label><span class="red">*</span>
+                <input id="negativenumber" name="input" type="number" />
+                <input type="button" onclick="trigger()" value="Submit Inputs"></input>
             </form>
         </div>
     </body>

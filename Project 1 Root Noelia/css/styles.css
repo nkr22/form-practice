@@ -1,0 +1,61 @@
+.btn {
+    margin: 5px;
+    height: 75px;
+}
+
+.btn-primary {
+    border-radius: 1rem !important;
+}
+
+#map {
+    font-size: x-large;
+    font-weight: 300;
+}
+
+#content,
+.title,
+.subtitle,
+#map {
+    font-family: "Quicksand", sans-serif;
+}
+
+.title {
+    font-size: x-large;
+    font-weight: 700;
+}
+
+.subtitle {
+    font-size: medium;
+    font-weight: 500;
+}
+
+#centerhead {
+    margin: 10px;
+}
+
+#navigator {
+    height: 30rem;
+    overflow-y: scroll;
+    scroll-behavior: smooth;
+}
+
+#crumbs {
+    text-align: center;
+    border-bottom: 1px black solid;
+    margin: 1rem;
+}
+
+.versesblock li {
+    list-style: none;
+    padding: 0.5rem;
+}
+.chapterheading {
+    text-align: center;
+}
+.navheading {
+    text-align: center;
+}
+
+.big {
+    font-size: xx-large;
+}

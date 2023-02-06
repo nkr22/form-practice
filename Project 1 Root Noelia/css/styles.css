@@ -1,10 +1,11 @@
 .btn {
-    margin: 5px;
-    height: 75px;
 }
 
 .btn-primary {
+    margin: 5px;
+    height: 75px;
     border-radius: 1rem !important;
+    letter-spacing: 100%;
 }
 
 #map {
@@ -30,19 +31,26 @@
 }
 
 #centerhead {
-    margin: 10px;
+    padding: 15px;
+    text-align: center;
+    background-color: #f6bccf;
+}
+
+#header {
+    border-bottom: 2px solid black;
 }
 
 #navigator {
     height: 30rem;
     overflow-y: scroll;
     scroll-behavior: smooth;
+    padding-top: 10px;
 }
 
 #crumbs {
     text-align: center;
-    border-bottom: 1px black solid;
     margin: 1rem;
+    font-size: 0.9rem;
 }
 
 .versesblock li {
@@ -58,4 +66,12 @@
 
 .big {
     font-size: xx-large;
+}
+
+.arrow {
+    border-radius: 1rem !important;
+}
+
+.arrow:hover {
+    background-color: aquamarine;
 }

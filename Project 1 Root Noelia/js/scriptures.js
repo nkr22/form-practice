@@ -4,19 +4,30 @@
 const Scriptures = (function () {
     "use strict";
     //constants
+    const INDEX_PLACENAME = 2;
+    const INDEX_LATITUDE = 3;
+    const INDEX_LONGITUDE = 4;
+    const INDEX_FLAG = 11;
+    const LAT_LONG_PARSER =
+        /\((.*),'(.*)',(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),'(.*)'\)/;
 
     //private variables
     let books;
+    let listMarkers = [];
     let volumes;
 
     //private method declarations
+    let addMarker;
     let ajax;
     let ajaxhtml;
     let cacheBooks;
+    let clearMarkers;
     let init;
     let nextChapter;
     let onHashChanged;
     let previousChapter;
+    let resetMap;
+    let setupMarkers;
     let showBooks;
     let showChapters;
     let showText;
@@ -26,6 +37,16 @@ const Scriptures = (function () {
     //private methods
 
     //method to get the request of the books and volumes
+    // addMarker = function (locName, latitude, longitude) {
+    //     let marker = new google.maps.Marker({
+    //         position: { lat: Number(latitude), lng: Number(longitude) },
+    //         map: map,
+    //         label: locName,
+    //     });
+
+    //     listMarkers.push(marker);
+    // };
+
     ajax = function (url, successCallback, failureCallback) {
         let request = new XMLHttpRequest();
 
@@ -89,6 +110,14 @@ const Scriptures = (function () {
         }
     };
 
+    clearMarkers = function () {
+        listMarkers.forEach(function (marker) {
+            marker.setMap(null);
+        });
+
+        listMarkers = [];
+    };
+
     //intialize all the variables to be able to access volumes and books later
     init = function (callback) {
         let booksLoaded = false;
@@ -127,10 +156,7 @@ const Scriptures = (function () {
                     chapter + 1,
                     titleForBookChapter(book, chapter + 1),
                 ];
-            }
-            // if (chapter === "undefined") {
-            // }
-            else {
+            } else {
                 let nextBook = books[bookId + 1];
 
                 if (nextBook !== "undefined") {
@@ -301,6 +327,103 @@ const Scriptures = (function () {
         }
     };
 
+    resetMap = function () {
+        map.setCenter({ lat: 31.7683, lng: 35.2137 });
+        map.setZoom(8);
+        clearMarkers();
+    };
+
+    setupMarkers = function () {
+        let markerImg = {
+            url: "../img/newicon.png",
+            size: new google.maps.Size(24, 36),
+            scaledSize: new google.maps.Size(24, 36),
+            labelOrigin: new google.maps.Point(60, 20),
+        };
+
+        let bounds = new google.maps.LatLngBounds();
+
+        if (listMarkers.length > 0) {
+            clearMarkers();
+        }
+
+        document
+            .querySelectorAll('a[onclick^="showLocation("]')
+            .forEach(function (element) {
+                let matches = LAT_LONG_PARSER.exec(
+                    element.getAttribute("onclick")
+                );
+
+                if (matches) {
+                    let placename = matches[INDEX_PLACENAME];
+                    let latitude = Number(matches[INDEX_LATITUDE]);
+                    let longitude = Number(matches[INDEX_LONGITUDE]);
+                    let flag = matches[INDEX_FLAG];
+
+                    if (flag !== "") {
+                        placename = `${placename} ${flag}`;
+                    }
+
+                    let marker = new google.maps.Marker({
+                        position: {
+                            lat: latitude,
+                            lng: longitude,
+                        },
+                        icon: markerImg,
+                        map: map,
+                        label: {
+                            color: "black",
+                            fontSize: "1rem",
+                            fontWeight: "500",
+                            text: placename,
+                        },
+                        maxZoom: 8,
+                        title: placename,
+                    });
+
+                    listMarkers.push(marker);
+
+                    bounds.extend(marker.getPosition());
+                }
+            });
+
+        let duplicateMarkers = [];
+
+        for (let i = 0; i < listMarkers.length; i++) {
+            for (let j = i + 1; j < listMarkers.length; j++) {
+                if (
+                    listMarkers[i].lat === listMarkers[j].lat &&
+                    listMarkers[i].lng === listMarkers[j].lng
+                ) {
+                    duplicateMarkers.push(listMarkers[j]);
+                    console.log("this is the list before popping");
+                    console.log(listMarkers);
+                    listMarkers.splice(j, 1);
+                    console.log("this is the list after popping");
+                    console.log(listMarkers);
+                }
+            }
+        }
+        console.log("this is the duplicate");
+        console.log(duplicateMarkers);
+
+        //what to do if only one
+        //what to do if there is none
+        if (listMarkers.length > 1) {
+            map.fitBounds(bounds);
+        }
+
+        if (listMarkers.length === 1) {
+            map.setCenter(listMarkers[0].getPosition());
+            map.setZoom(12);
+        }
+
+        if (listMarkers.length === 0) {
+            map.setCenter({ lat: 31.7683, lng: 35.2137 });
+            map.setZoom(8);
+        }
+    };
+
     showBooks = function (volume) {
         const myDiv = document.getElementById("navigator");
         myDiv.innerHTML = "";
@@ -318,15 +441,10 @@ const Scriptures = (function () {
             // creating button element
             let button = document.createElement("button");
 
-            // creating text to be
-            //displayed on button
-            // let text = document.createTextNode(vbook.fullName);
-            // button.appendChild(text);
-
             // appending text to button
             button.innerHTML = vbook.fullName;
 
-            button.className += "col-3 ";
+            button.className += "col-4 ";
             button.className += "btn btn-primary";
             button.addEventListener("click", function () {
                 window.location.hash += ":" + vbook.id;
@@ -335,6 +453,7 @@ const Scriptures = (function () {
             // appending button to div
             myDiv.appendChild(button);
         });
+        resetMap();
     };
 
     showChapters = function (volume, book) {
@@ -372,6 +491,7 @@ const Scriptures = (function () {
             // appending button to div
             myDiv.appendChild(button);
         }
+        resetMap();
     };
 
     showText = function (volume, book, chapter) {
@@ -403,15 +523,13 @@ const Scriptures = (function () {
             (data) => {
                 text = data;
                 myDiv.innerHTML = text;
+                setupMarkers();
             }
         );
 
         //setting previous and next chapter buttons
         let prevbutton = document.createElement("button");
         let nextbutton = document.createElement("button");
-
-        // creating text to be
-        //displayed on button
 
         //setting previous button classes, tooltip, and functions
 
@@ -420,7 +538,7 @@ const Scriptures = (function () {
         if (pchaptervalues[0] !== undefined) {
             prevbutton.innerHTML = `<<`;
             prevbutton.className += "col-1 ";
-            prevbutton.className += "btn ";
+            prevbutton.className += "btn arrow";
             let pvolumetopass = books[pchaptervalues[0]].parentBookId;
             let pbooktopass = pchaptervalues[0];
             let pchaptertopass = pchaptervalues[1];
@@ -434,7 +552,7 @@ const Scriptures = (function () {
         //setting next button classes, tooltip, and functions
         nextbutton.innerHTML = `>>`;
         nextbutton.className += "col-1 ";
-        nextbutton.className += "btn ";
+        nextbutton.className += "btn arrow";
         let nchaptervalues = nextChapter(book[0].id, chapter);
         let nvolumetopass = books[nchaptervalues[0]].parentBookId;
         let nbooktopass = nchaptervalues[0];
@@ -474,6 +592,7 @@ const Scriptures = (function () {
             // appending button to div
             myDiv.appendChild(button);
         });
+        resetMap();
     };
 
     titleForBookChapter = function (book, chapter) {

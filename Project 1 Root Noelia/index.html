@@ -33,17 +33,21 @@
     <body>
         <header id="header">
             <div id="centerhead">
-                <div class="title">The Scriptures, Mapped</div>
-                <div class="subtitle">Noelia Root</div>
+                <div class="row" style="margin: auto">
+                    <div class="title col-12">
+                        The Scriptures, Mapped <br />
+                        <div class="subtitle">Noelia Root</div>
+                    </div>
+                </div>
             </div>
         </header>
         <div id="content">
             <div class="row">
-                <div id="crumbs" class="col-6"></div>
+                <div id="crumbs" class="col-5"></div>
             </div>
             <div class="row">
-                <div id="navigator" class="col-6"></div>
-                <div id="map" class="col-6">Map</div>
+                <div id="navigator" class="col-5"></div>
+                <div id="map" class="col-7">Map</div>
             </div>
         </div>
 
@@ -53,8 +57,14 @@
             /* YOUR INITIALIZATION CODE GOES HERE */
 
             let map;
+
             function initMap() {
                 //initialize our global map variable
+                const jeru = { lat: 31.7683, lng: 35.2137 };
+                map = new google.maps.Map(document.getElementById("map"), {
+                    center: jeru,
+                    zoom: 8,
+                });
             }
             function ready(readyListener) {
                 if (document.readyState !== "loading") {

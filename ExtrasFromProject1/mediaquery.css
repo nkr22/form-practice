@@ -1,0 +1,98 @@
+/* Default styles for all devices */
+body {
+    font-size: 16px;
+}
+
+header {
+    padding: 20px;
+    background-color: #333;
+    color: #fff;
+}
+
+/* Styles for mobile devices with a screen width of 320px or less */
+@media only screen and (max-width: 320px) {
+    body {
+        font-size: 14px;
+    }
+
+    header {
+        padding: 10px;
+    }
+}
+
+/* Styles for tablet devices with a screen width between 321px and 767px */
+@media only screen and (min-width: 321px) and (max-width: 767px) {
+    body {
+        font-size: 18px;
+    }
+
+    header {
+        padding: 15px;
+    }
+}
+
+/* Styles for desktop devices with a screen width of 1080px or more */
+@media only screen and (min-width: 1080px) {
+    body {
+        font-size: 20px;
+    }
+
+    header {
+        padding: 25px;
+    }
+}
+
+.old-content {
+    position: absolute;
+    left: 0;
+    transition: left 1s ease-in-out;
+}
+
+.new-content {
+    position: absolute;
+    left: 100%;
+    transition: left 1s ease-in-out;
+}
+
+/* Sliding the old content out and new content in when navigating between scripture chapters: */
+/* When navigating to the next chapter, add the slide-out class to the old content and slide-in class to the new content. 
+When navigating to the previous chapter, do the opposite. */
+.slide-in {
+    .old-content {
+        left: -100%;
+    }
+    .new-content {
+        left: 0;
+    }
+}
+
+.slide-out {
+    .old-content {
+        left: 100%;
+    }
+    .new-content {
+        left: 0;
+    }
+}
+
+/* Cross-fade animation when navigating across levels in the hierarchy: */
+/* When navigating across levels in the hierarchy, add the fade-in class to the new content and remove the old content. */
+
+.old-content {
+    opacity: 1;
+    transition: opacity 1s ease-in-out;
+}
+
+.new-content {
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+.fade-in {
+    .old-content {
+        opacity: 0;
+    }
+    .new-content {
+        opacity: 1;
+    }
+}

@@ -43,10 +43,14 @@
         </header>
         <div id="content">
             <div class="row">
-                <div id="crumbs" class="col-5"></div>
-            </div>
-            <div class="row">
-                <div id="navigator" class="col-5"></div>
+                <div id="navigatorouter" class="col-5">
+                    <div class="row">
+                        <div id="crumbs" class="col-12"></div>
+                    </div>
+                    <div class="row">
+                        <div id="navigator" class="col-12"></div>
+                    </div>
+                </div>
                 <div id="map" class="col-7">Map</div>
             </div>
         </div>
@@ -76,6 +80,24 @@
                     );
                 }
             }
+            let showLocation;
+            showLocation = function (
+                geotagId,
+                placename,
+                latitude,
+                longitude,
+                viewLatitude,
+                viewLongitude,
+                viewTilt,
+                viewRoll,
+                viewAltitude,
+                viewHeading
+            ) {
+                map.setCenter({ lat: latitude, lng: longitude });
+
+                map.setZoom(Math.round(viewAltitude / 450));
+            };
+
             ready(function () {
                 Scriptures.init(function () {
                     //put stuff here that you want to do after init
@@ -84,7 +106,6 @@
                         "hashchange",
                         Scriptures.onHashChanged
                     );
-                    // Scriptures.showVolumes();
                 });
             });
         </script>

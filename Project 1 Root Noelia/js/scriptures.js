@@ -4,15 +4,22 @@
 const Scriptures = (function () {
     "use strict";
     //constants
+    const FIRST_BOOKS = [
+        "Genesis",
+        "The Book of Moses",
+        "Title Page",
+        "Explanatory Introduction",
+    ];
     const INDEX_PLACENAME = 2;
     const INDEX_LATITUDE = 3;
     const INDEX_LONGITUDE = 4;
     const INDEX_FLAG = 11;
+    const INDEX_ZOOM = 9;
     const LAT_LONG_PARSER =
         /\((.*),'(.*)',(.*),(.*),(.*),(.*),(.*),(.*),(.*),(.*),'(.*)'\)/;
-
     //private variables
     let books;
+    let listActualMarkers = [];
     let listMarkers = [];
     let volumes;
 
@@ -20,33 +27,66 @@ const Scriptures = (function () {
     let addMarker;
     let ajax;
     let ajaxhtml;
+    let breadcrumbs;
     let cacheBooks;
     let clearMarkers;
+    let indexofMatchingPlace;
     let init;
     let nextChapter;
     let onHashChanged;
     let previousChapter;
     let resetMap;
+    let sameLocation;
     let setupMarkers;
     let showBooks;
+    let showButtons;
     let showChapters;
     let showText;
     let showVolumes;
     let titleForBookChapter;
+    let uniqueGeoPlaces;
 
     //private methods
 
+    //add a marker to a list
+    addMarker = function (matches) {
+        let markerImg = {
+            url: "../img/newicon.png",
+            size: new google.maps.Size(24, 36),
+            scaledSize: new google.maps.Size(24, 36),
+            labelOrigin: new google.maps.Point(60, 20),
+        };
+        let placename = matches[INDEX_PLACENAME];
+        let latitude = Number(matches[INDEX_LATITUDE]);
+        let longitude = Number(matches[INDEX_LONGITUDE]);
+        let zoom = Math.round(Number(matches[INDEX_ZOOM]) / 450);
+        let flag = matches[INDEX_FLAG];
+
+        if (flag !== "") {
+            placename = `${placename} ${flag}`;
+        }
+
+        let marker = {
+            position: {
+                lat: latitude,
+                lng: longitude,
+            },
+            icon: markerImg,
+            map: map,
+            label: {
+                color: "black",
+                fontSize: "1rem",
+                fontWeight: "500",
+                text: placename,
+            },
+            maxZoom: zoom,
+            title: placename,
+        };
+
+        listMarkers.push(marker);
+    };
+
     //method to get the request of the books and volumes
-    // addMarker = function (locName, latitude, longitude) {
-    //     let marker = new google.maps.Marker({
-    //         position: { lat: Number(latitude), lng: Number(longitude) },
-    //         map: map,
-    //         label: locName,
-    //     });
-
-    //     listMarkers.push(marker);
-    // };
-
     ajax = function (url, successCallback, failureCallback) {
         let request = new XMLHttpRequest();
 
@@ -92,6 +132,31 @@ const Scriptures = (function () {
         request.send();
     };
 
+    //make breadcrumbs for every page
+    breadcrumbs = function (volume, book, chapter) {
+        if (chapter === 0 || !chapter) {
+            chapter = "";
+        }
+
+        //setting breadcrumbs
+        document.getElementById("crumbs").innerHTML = "";
+        document.getElementById("crumbs").innerHTML += `<a href='#'">Home</a> `;
+        if (volume) {
+            document.getElementById(
+                "crumbs"
+            ).innerHTML += `| <a href="javascript:void(0);" onclick="window.location.hash='${volume.id}'">${volume.fullName} </a>`;
+        }
+        if (book) {
+            document.getElementById(
+                "crumbs"
+            ).innerHTML += `| <a href="javascript:void(0);" onclick="window.location.hash='${volume.id}:${book[0].id}'">${book[0].fullName} </a>`;
+        }
+        if (chapter !== "" && chapter !== 0) {
+            document.getElementById(
+                "crumbs"
+            ).innerHTML += `| <a href="javascript:void(0);"> Chapter ${chapter} </a>`;
+        }
+    };
     // create the variables in the cache
     cacheBooks = function (callback) {
         volumes.forEach((volume) => {
@@ -109,13 +174,27 @@ const Scriptures = (function () {
             callback();
         }
     };
-
+    //clear the markers from the map
     clearMarkers = function () {
-        listMarkers.forEach(function (marker) {
+        listActualMarkers.forEach((marker) => {
             marker.setMap(null);
         });
+        listActualMarkers = [];
+    };
+    // figure out what is the index of the marker that matches another
+    indexofMatchingPlace = function (array, geoplace) {
+        let index = -1;
+        let i = 0;
 
-        listMarkers = [];
+        while (i < array.length) {
+            if (sameLocation(array[i], geoplace)) {
+                index = i;
+                break;
+            }
+            i++;
+        }
+
+        return index;
     };
 
     //intialize all the variables to be able to access volumes and books later
@@ -145,7 +224,7 @@ const Scriptures = (function () {
             }
         );
     };
-
+    //figure out the name for the next chapter
     nextChapter = function (bookId, chapter) {
         let book = books[bookId];
 
@@ -175,7 +254,7 @@ const Scriptures = (function () {
             }
         }
     };
-
+    //what happens when the hash changes
     onHashChanged = function () {
         let string;
         let splitString;
@@ -196,15 +275,17 @@ const Scriptures = (function () {
         }
         // If we have one ID, it’s a volume, so navigate to that volume
         if (splitString.length === 1) {
+            // But if the volume ID is < 1 or > 5, it’s invalid, so navigate to “home”
+            if (Number(splitString[0]) < 1 || Number(splitString[0]) > 5) {
+                //hash for home screen
+                window.location.hash = "";
+                return;
+            }
             //hash for a volume
-            Scriptures.showBooks(volumes[splitString[0] - 1]);
-            return;
-        }
-        // But if the volume ID is < 1 or > 5, it’s invalid, so navigate to “home”
-        if (Number(splitString[0]) < 1 || Number(splitString[0]) > 5) {
-            //hash for home screen
-            Scriptures.showVolumes();
-            return;
+            else {
+                Scriptures.showBooks(volumes[splitString[0] - 1]);
+                return;
+            }
         }
 
         if (splitString.length === 2) {
@@ -217,7 +298,7 @@ const Scriptures = (function () {
                 Number(splitString[1]) >
                     Number(volumes[splitString[0] - 1].maxBookId)
             ) {
-                Scriptures.showVolumes();
+                window.location.hash = "";
                 return;
             }
             // If we have two ID’s, it’s a volume and book, so navigate to that book’s list
@@ -260,7 +341,7 @@ const Scriptures = (function () {
                 Number(splitString[2]) > Number(passbook[0].numChapters) ||
                 Number(splitString[2]) < 0
             ) {
-                Scriptures.showVolumes();
+                window.location.hash = "";
                 return;
             }
             if (
@@ -286,7 +367,7 @@ const Scriptures = (function () {
         }
         // If invalid, navigate “home”
     };
-
+    //figure out the name of the previous chapter
     previousChapter = function (bookId, chapter) {
         let book = books[bookId];
 
@@ -299,12 +380,9 @@ const Scriptures = (function () {
                 ];
             }
             if (
-                (chapter === 1 &&
-                    (chapter <= book.numChapters) &
-                        (book.fullName === "Genesis")) ||
-                book.fullName === "The Book of Moses" ||
-                book.fullName === "Title Page" ||
-                book.fullName === "Explanatory Introduction"
+                (chapter === 1 || chapter === "") &&
+                chapter <= book.numChapters &&
+                FIRST_BOOKS.includes(book.fullName)
             ) {
                 return [undefined, undefined, undefined];
             } else {
@@ -326,25 +404,23 @@ const Scriptures = (function () {
             }
         }
     };
-
+    //clear the map and center it on Jerusalem
     resetMap = function () {
         map.setCenter({ lat: 31.7683, lng: 35.2137 });
         map.setZoom(8);
         clearMarkers();
     };
-
+    //see if two locations are the same
+    sameLocation = function (place1, place2) {
+        return (
+            Math.abs(place1.position.lat - place2.position.lat) < 0.0000001 &&
+            Math.abs(place1.position.lng - place2.position.lng) < 0.0000001
+        );
+    };
+    // grap the a tags for locations and put them into their own objects
     setupMarkers = function () {
-        let markerImg = {
-            url: "../img/newicon.png",
-            size: new google.maps.Size(24, 36),
-            scaledSize: new google.maps.Size(24, 36),
-            labelOrigin: new google.maps.Point(60, 20),
-        };
-
-        let bounds = new google.maps.LatLngBounds();
-
         if (listMarkers.length > 0) {
-            clearMarkers();
+            listMarkers = [];
         }
 
         document
@@ -355,86 +431,19 @@ const Scriptures = (function () {
                 );
 
                 if (matches) {
-                    let placename = matches[INDEX_PLACENAME];
-                    let latitude = Number(matches[INDEX_LATITUDE]);
-                    let longitude = Number(matches[INDEX_LONGITUDE]);
-                    let flag = matches[INDEX_FLAG];
-
-                    if (flag !== "") {
-                        placename = `${placename} ${flag}`;
-                    }
-
-                    let marker = new google.maps.Marker({
-                        position: {
-                            lat: latitude,
-                            lng: longitude,
-                        },
-                        icon: markerImg,
-                        map: map,
-                        label: {
-                            color: "black",
-                            fontSize: "1rem",
-                            fontWeight: "500",
-                            text: placename,
-                        },
-                        maxZoom: 8,
-                        title: placename,
-                    });
-
-                    listMarkers.push(marker);
-
-                    bounds.extend(marker.getPosition());
+                    addMarker(matches);
                 }
             });
 
-        let duplicateMarkers = [];
-
-        for (let i = 0; i < listMarkers.length; i++) {
-            for (let j = i + 1; j < listMarkers.length; j++) {
-                if (
-                    listMarkers[i].lat === listMarkers[j].lat &&
-                    listMarkers[i].lng === listMarkers[j].lng
-                ) {
-                    duplicateMarkers.push(listMarkers[j]);
-                    console.log("this is the list before popping");
-                    console.log(listMarkers);
-                    listMarkers.splice(j, 1);
-                    console.log("this is the list after popping");
-                    console.log(listMarkers);
-                }
-            }
-        }
-        console.log("this is the duplicate");
-        console.log(duplicateMarkers);
-
-        //what to do if only one
-        //what to do if there is none
-        if (listMarkers.length > 1) {
-            map.fitBounds(bounds);
-        }
-
-        if (listMarkers.length === 1) {
-            map.setCenter(listMarkers[0].getPosition());
-            map.setZoom(12);
-        }
-
-        if (listMarkers.length === 0) {
-            map.setCenter({ lat: 31.7683, lng: 35.2137 });
-            map.setZoom(8);
-        }
+        uniqueGeoPlaces(listMarkers);
     };
-
+    //show the books for a certain volume
     showBooks = function (volume) {
         const myDiv = document.getElementById("navigator");
         myDiv.innerHTML = "";
         myDiv.style.textAlign = "center";
 
-        //creating crumbs to navigate backwards
-        document.getElementById("crumbs").innerHTML = "";
-        document.getElementById("crumbs").innerHTML += `<a href='#'">Home</a> `;
-        document.getElementById(
-            "crumbs"
-        ).innerHTML += `| <a href="javascript:void(0);">${volume.fullName} </a>`;
+        breadcrumbs(volume);
 
         let vbooks = volume.books;
         vbooks.forEach(function (vbook) {
@@ -456,77 +465,8 @@ const Scriptures = (function () {
         resetMap();
     };
 
-    showChapters = function (volume, book) {
-        const myDiv = document.getElementById("navigator");
-        myDiv.innerHTML = "";
-        myDiv.style.textAlign = "center";
-
-        //creating crumbs to navigate backwards
-        document.getElementById("crumbs").innerHTML = "";
-        document.getElementById("crumbs").innerHTML += `<a href='#'">Home</a> `;
-        document.getElementById(
-            "crumbs"
-        ).innerHTML += `| <a href="javascript:void(0);" onclick="window.location.hash='${volume.id}'">${volume.fullName} </a>`;
-        document.getElementById(
-            "crumbs"
-        ).innerHTML += `| <a href="javascript:void(0);">${book[0].fullName} </a>`;
-
-        let bchapters = book[0]["numChapters"];
-        for (let i = 1; i <= bchapters; i = i + 1) {
-            // creating button element
-            let button = document.createElement("button");
-
-            // creating text to be
-            //displayed on button
-            let text = document.createTextNode(i);
-
-            // appending text to button
-            button.appendChild(text);
-            button.className += "col-2 ";
-            button.className += "btn btn-primary";
-            button.addEventListener("click", function () {
-                window.location.hash += ":" + i;
-            });
-
-            // appending button to div
-            myDiv.appendChild(button);
-        }
-        resetMap();
-    };
-
-    showText = function (volume, book, chapter) {
-        const myDiv = document.getElementById("navigator");
-        myDiv.style.textAlign = "left";
-        let text;
-        myDiv.innerHTML = "";
-
-        if (chapter === 0) {
-            chapter = "";
-        }
-
-        //setting breadcrumbs
-        document.getElementById("crumbs").innerHTML = "";
-        document.getElementById("crumbs").innerHTML += `<a href='#'">Home</a> `;
-        document.getElementById(
-            "crumbs"
-        ).innerHTML += `| <a href="javascript:void(0);" onclick="window.location.hash='${volume.id}'">${volume.fullName} </a>`;
-        document.getElementById(
-            "crumbs"
-        ).innerHTML += `| <a href="javascript:void(0);" onclick="window.location.hash='${volume.id}:${book[0].id}'">${book[0].fullName} </a>`;
-        if (chapter !== "" && chapter !== 0) {
-            document.getElementById(
-                "crumbs"
-            ).innerHTML += `| <a href="javascript:void(0);"> Chapter ${chapter} </a>`;
-        }
-        ajaxhtml(
-            `https://scriptures.byu.edu/mapscrip/mapgetscrip.php?book=${book[0].id}&chap=${chapter}&verses=`,
-            (data) => {
-                text = data;
-                myDiv.innerHTML = text;
-                setupMarkers();
-            }
-        );
-
+    //show the previous and nextbuttons
+    showButtons = function (book, chapter) {
         //setting previous and next chapter buttons
         let prevbutton = document.createElement("button");
         let nextbutton = document.createElement("button");
@@ -564,7 +504,61 @@ const Scriptures = (function () {
 
         document.getElementById("crumbs").append(nextbutton);
     };
+    //show all the chapters for a certain book
+    showChapters = function (volume, book) {
+        const myDiv = document.getElementById("navigator");
+        myDiv.innerHTML = "";
+        myDiv.style.textAlign = "center";
 
+        breadcrumbs(volume, book);
+
+        let bchapters = book[0]["numChapters"];
+        for (let i = 1; i <= bchapters; i = i + 1) {
+            // creating button element
+            let button = document.createElement("button");
+
+            // creating text to be
+            //displayed on button
+            let text = document.createTextNode(i);
+
+            // appending text to button
+            button.appendChild(text);
+            button.className += "col-2 ";
+            button.className += "btn btn-primary";
+            button.addEventListener("click", function () {
+                window.location.hash += ":" + i;
+            });
+
+            // appending button to div
+            myDiv.appendChild(button);
+        }
+        resetMap();
+    };
+    // show the text for a certain chapter
+    showText = function (volume, book, chapter) {
+        const myDiv = document.getElementById("navigator");
+        myDiv.style.textAlign = "left";
+        let text;
+        myDiv.innerHTML = "";
+
+        if (chapter === 0) {
+            chapter = "";
+        }
+
+        breadcrumbs(volume, book, chapter);
+
+        ajaxhtml(
+            `https://scriptures.byu.edu/mapscrip/mapgetscrip.php?book=${book[0].id}&chap=${chapter}&verses=`,
+            (data) => {
+                text = data;
+                myDiv.innerHTML = text;
+                setupMarkers();
+            }
+        );
+
+        showButtons(book, chapter);
+    };
+    // show the standard works volumes
     showVolumes = function () {
         const myDiv = document.getElementById("navigator");
 
@@ -594,7 +588,7 @@ const Scriptures = (function () {
         });
         resetMap();
     };
-
+    //figure out the title for a chapter given a book and chapter number
     titleForBookChapter = function (book, chapter) {
         if (book !== "undefined") {
             if (chapter > 0) {
@@ -604,13 +598,69 @@ const Scriptures = (function () {
             return book.tocName;
         }
     };
+    //create the markers on the map and check to make sure they are unique
+    uniqueGeoPlaces = function (geoplaces) {
+        const uniquePlaces = [];
+        console.log(uniquePlaces.length);
+        if (listActualMarkers.length > 0) {
+            clearMarkers();
+        }
+        let bounds = new google.maps.LatLngBounds();
 
-    //for geocoding
-    //document.querySelectorAll("a[onclick^=showLocation]")
-    //iterate through all the markers to find maximum latitude and longitude
-    //make a box
-    //dont have any duplicates for location
-    //if they are the same location, have it be the same point, but just a ", name" be added to the label
+        geoplaces.forEach((geoplace) => {
+            let i = indexofMatchingPlace(uniquePlaces, geoplace);
+            if (i >= 0) {
+                // we have this location, test the name
+                if (!uniquePlaces[i].label.text.includes(geoplace.label.text)) {
+                    uniquePlaces[i].label.text += `, ${geoplace.label.text}`;
+                }
+            } else {
+                //It is not found, add the the array
+                uniquePlaces.push(geoplace);
+            }
+        });
+
+        uniquePlaces.forEach((marker) => {
+            let blah = new google.maps.Marker({
+                position: {
+                    lat: marker.position.lat,
+                    lng: marker.position.lng,
+                },
+                icon: marker.icon,
+                map: map,
+                label: {
+                    color: "black",
+                    fontSize: "1rem",
+                    fontWeight: "700",
+                    align: "left",
+                    text: marker.label.text,
+                },
+                maxZoom: marker.maxZoom,
+                title: marker.title,
+            });
+
+            bounds.extend({
+                lat: marker.position.lat,
+                lng: marker.position.lng,
+            });
+
+            listActualMarkers.push(blah);
+        });
+
+        if (listActualMarkers.length > 1) {
+            map.fitBounds(bounds);
+        }
+
+        if (listActualMarkers.length === 1) {
+            map.setCenter(listActualMarkers[0].position);
+            map.setZoom(listActualMarkers[0].maxZoom + 2);
+        }
+
+        if (listActualMarkers.length === 0) {
+            map.setCenter({ lat: 31.7683, lng: 35.2137 });
+            map.setZoom(8);
+        }
+    };
 
     //public API
     return {

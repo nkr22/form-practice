@@ -87,49 +87,53 @@ const Scriptures = (function () {
     };
 
     //method to get the request of the books and volumes
-    ajax = function (url, successCallback, failureCallback) {
-        let request = new XMLHttpRequest();
-
-        request.open("GET", url, true);
-
-        request.onload = function () {
-            if (request.status >= 200 && request.status < 400) {
-                let data = JSON.parse(request.responseText);
-
-                if (typeof successCallback === "function") {
-                    successCallback(data);
-                }
-            } else {
-                if (typeof failureCallback === "function") {
-                    failureCallback(request);
-                }
-            }
-        };
-        request.onerror = failureCallback;
-        request.send();
+    ajax = function (url) {
+        return new Promise((resolve, reject) => {
+            fetch(url)
+                .then((response) => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        reject(
+                            new Error(
+                                "Request failed with status code: " +
+                                    response.status
+                            )
+                        );
+                    }
+                })
+                .then((data) => {
+                    resolve(data);
+                })
+                .catch((error) => {
+                    reject(error);
+                });
+        });
     };
 
     //get html to display the text for the chapters
-    ajaxhtml = function (url, successCallback, failureCallback) {
-        let request = new XMLHttpRequest();
-
-        request.open("GET", url, true);
-
-        request.onload = function () {
-            if (request.status >= 200 && request.status < 400) {
-                let data = request.responseText;
-
-                if (typeof successCallback === "function") {
-                    successCallback(data);
-                }
-            } else {
-                if (typeof failureCallback === "function") {
-                    failureCallback(request);
-                }
-            }
-        };
-        request.onerror = failureCallback;
-        request.send();
+    ajaxhtml = function (url) {
+        return new Promise((resolve, reject) => {
+            fetch(url)
+                .then((response) => {
+                    if (response.ok) {
+                        return response.text();
+                    } else {
+                        reject(
+                            new Error(
+                                "Request failed with status code: " +
+                                    response.status
+                            )
+                        );
+                    }
+                })
+                .then((data) => {
+                    resolve(data);
+                })
+                .catch((error) => {
+                    reject(error);
+                });
+        });
     };
 
     //make breadcrumbs for every page
@@ -154,7 +158,7 @@ const Scriptures = (function () {
         if (chapter !== "" && chapter !== 0) {
             document.getElementById(
                 "crumbs"
-            ).innerHTML += `| <a href="javascript:void(0);"> Chapter ${chapter} </a>`;
+            ).innerHTML += `| <a href="javascript:void(0);"> ${book[0].subdiv} ${chapter} </a>`;
         }
     };
     // create the variables in the cache
@@ -199,30 +203,19 @@ const Scriptures = (function () {
 
     //intialize all the variables to be able to access volumes and books later
     init = function (callback) {
-        let booksLoaded = false;
-        let volumesLoaded = false;
-
-        ajax("https://scriptures.byu.edu/mapscrip/model/books.php", (data) => {
-            books = data;
-            console.log(books);
-            booksLoaded = true;
-
-            if (volumesLoaded) {
-                cacheBooks(callback);
-            }
+        const promise1 = ajax(
+            "https://scriptures.byu.edu/mapscrip/model/volumes.php"
+        ).then(function (result) {
+            volumes = result;
         });
-        ajax(
-            "https://scriptures.byu.edu/mapscrip/model/volumes.php",
-            (data) => {
-                volumes = data;
-                volumesLoaded = true;
-                console.log(volumes);
-
-                if (booksLoaded) {
-                    cacheBooks(callback);
-                }
-            }
-        );
+        const promise2 = ajax(
+            "https://scriptures.byu.edu/mapscrip/model/books.php"
+        ).then(function (result) {
+            books = result;
+        });
+        Promise.all([promise1, promise2]).then(function () {
+            cacheBooks(callback);
+        });
     };
     //figure out the name for the next chapter
     nextChapter = function (bookId, chapter) {
@@ -476,7 +469,7 @@ const Scriptures = (function () {
         let pchaptervalues = previousChapter(book[0].id, chapter);
 
         if (pchaptervalues[0] !== undefined) {
-            prevbutton.innerHTML = `<<`;
+            prevbutton.innerHTML = `<i class="fa fa-angle-double-left" aria-hidden="true"></i>`;
             prevbutton.className += "col-1 ";
             prevbutton.className += "btn arrow";
             let pvolumetopass = books[pchaptervalues[0]].parentBookId;
@@ -490,7 +483,7 @@ const Scriptures = (function () {
         }
 
         //setting next button classes, tooltip, and functions
-        nextbutton.innerHTML = `>>`;
+        nextbutton.innerHTML = `<i class="fa fa-angle-double-right" aria-hidden="true"></i>`;
         nextbutton.className += "col-1 ";
         nextbutton.className += "btn arrow";
         let nchaptervalues = nextChapter(book[0].id, chapter);
@@ -548,13 +541,12 @@ const Scriptures = (function () {
         breadcrumbs(volume, book, chapter);
 
         ajaxhtml(
-            `https://scriptures.byu.edu/mapscrip/mapgetscrip.php?book=${book[0].id}&chap=${chapter}&verses=`,
-            (data) => {
-                text = data;
-                myDiv.innerHTML = text;
-                setupMarkers();
-            }
-        );
+            `https://scriptures.byu.edu/mapscrip/mapgetscrip.php?book=${book[0].id}&chap=${chapter}&verses=`
+        ).then(function (response) {
+            text = response;
+            myDiv.innerHTML = text;
+            setupMarkers();
+        });
 
         showButtons(book, chapter);
     };
@@ -601,7 +593,6 @@ const Scriptures = (function () {
     //create the markers on the map and check to make sure they are unique
     uniqueGeoPlaces = function (geoplaces) {
         const uniquePlaces = [];
-        console.log(uniquePlaces.length);
         if (listActualMarkers.length > 0) {
             clearMarkers();
         }

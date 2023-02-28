@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- This tag is recommended by Google for responsive designs (http://bit.ly/2kjtFmy) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="./css/hover.css" />
+    <link rel="stylesheet" href="./css/animate.css" />
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="chapter onscreen" id="chapter1">
+            <p>Chapter 1</p>
+            <p>Click me to slide Chapter 2 in from the right.</p>
+        </div>
+        <div class="chapter offscreen-slideright" id="chapter2">
+            <p>Chapter 2</p>
+            <p>Click me to slide Chapter 1 in from the left.</p>
+        </div>
+    </div>
+    <div class="map">
+        <p>Pretend a map is here.</p>
+<pre>
+       ,__                                                  _,
+    \~\|  ~~---___              ,                          | \
+     | Wash.| |   ~~~~~~~|~~~~~| ~~---,   _            VT_/,ME&gt;
+    /~-_--__| |  Montana |N Dak\ Minn/ ~\~_/Mich.     /~| ||,'
+    |Oregon |  \         |------|   { WI / /~)     __-NY',|_\,NH
+   /       |Ida.|~~~~~~~~|S Dak.\    \   | | '~\  |_____,|~,-'Mass.
+   |~~--__ |    | Wyoming|____  |~~~~~|--| |__ /_-'Penn.{,~Conn (RI)
+   |   |  ~~~|~~|        |    ~~\ Iowa/  `-' |`~ |~_____{/NJ
+   |   | Nev |  '---------, Nebr.\----|   |IN|OH,' ~/~\,|`MD (DE)
+   ',  \     |Utah| Colo. |~~~~~~~|    \IL| ,'~~\WV/ VA |
+    |Cal\    |    |       | Kansas| MO  \_-~ KY /`~___--\
+    ',   \  ,-----|-------+-------'_____/__----~~/N Car./
+     '_   '\|     |      |~~~|Okla.|    | Tenn._/-,~~-,/
+       \    |Ariz.| New  |   |_    |Ark./~~|~~\    \,/S Car.
+        ~~~-'     | Mex. |     `~~~\___|MS |AL | GA /
+            '-,_  | _____|          |  /   | ,-'---~\
+                `~'~  \    Texas    |LA`--,~~~~-~~,FL\
+                       \/~\      /~~~`---`         |  \
+                           \    /                   \  |
+                            \  |                     '\'
+                             `~'
+</pre>
+        <p>Click this div to run a cross-fade animation.</p>
+        <span class="box-demo">Hover over me!</span>
+    </div>
+    <div id="clickme">
+        Click me!
+    </div>
+    <script type="module">
+        import("./js/animation.js");
+    </script>
+</body>
+</html>

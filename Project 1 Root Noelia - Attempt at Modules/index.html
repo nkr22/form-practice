@@ -10,6 +10,7 @@
         <link rel="stylesheet" href="./css/styles.css" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link rel="icon" href="./img/bible.png" />
         <link
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
@@ -52,7 +53,14 @@
                         <div id="crumbs" class="col-12"></div>
                     </div>
                     <div class="row">
-                        <div id="navigator" class="col-12"></div>
+                        <div id="navigator" class="col-12">
+                            <div id="books"></div>
+                            <div class="chapter onscreen" id="chapter1"></div>
+                            <div
+                                class="chapter offscreen-slideright"
+                                id="chapter2"
+                            ></div>
+                        </div>
                     </div>
                 </div>
                 <div id="map" class="col-7">Map</div>

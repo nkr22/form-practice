@@ -1,0 +1,8 @@
+.box-demo:hover {
+    transition-property: background-color, color, box-shadow;
+    transition-duration: 350ms;
+    transition-timing-function: ease-out;
+    color: black;
+    background-color: white;
+    box-shadow: 2px 2px 1px gray;
+}

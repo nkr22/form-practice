@@ -38,10 +38,11 @@
 }
 
 #navigator {
-    height: 30rem;
+    height: 30em;
     overflow-y: scroll;
     scroll-behavior: smooth;
     padding-top: 5px;
+    position: relative;
 }
 
 #crumbs {
@@ -74,3 +75,69 @@
 .arrow:hover {
     background-color: aquamarine;
 }
+
+/* Define a global transition for all elements */
+* {
+    transition: all 0.3s ease-out;
+}
+
+.slideleft-prepare-offscreen {
+    left: -100%;
+    opacity: 1;
+}
+
+.slideright-prepare-offscreen {
+    left: 100%;
+    opacity: 1;
+}
+
+.crossfade-prepare-offscreen {
+    opacity: 0;
+    z-index: 2;
+}
+
+/*
+ * The onscreen div is in its normal position, fully opaque.
+ */
+.onscreen {
+    left: 0%;
+    z-index: 2;
+    opacity: 1;
+    transition: 350ms ease-out;
+    transition-property: left, opacity;
+}
+
+/*
+ * Unlike the "prepare" classes, the "offscreen" divs DO need to animate.
+ * They end up to the left, right, and original position, respectively.
+ * Note that the cross-faded offscreen div should be transparent and below
+ * the onscreen div.
+ */
+.slideleft-offscreen {
+    left: -100%;
+    transition: left 350ms ease-out;
+}
+
+.slideright-offscreen {
+    left: 100%;
+    transition: left 350ms ease-out;
+}
+
+.crossfade-offscreen {
+    opacity: 0;
+    z-index: 1;
+    transition: opacity 3500ms ease-out;
+}
+
+.chapter {
+    position: absolute;
+    width: 100%;
+    top: 0;
+}
+
+/* #books {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+} */

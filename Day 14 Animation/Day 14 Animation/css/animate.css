@@ -1,0 +1,64 @@
+/*
+ * These rules let us animate the navigation animation.
+ * We can either slide left, slide right, or cross fade.
+ * When we have one of the "***-prepare-offscreen" classes,
+ * the element is not visible but is in position to begin
+ * the animation.  When we have the "onscreen" class, the
+ * element is visible and in position.  When we have one of
+ * the "***-offscreen" classes, the element is not visible and
+ * the animation has completed.
+ */
+
+/*
+  * The "prepare" classes position the offscreen div where it needs to
+  * be when we start the animation (either to the right, left, or in
+  * the original position respectively).  Note that the cross-faded
+  * animation starts out transparent.
+  */
+.slideleft-prepare-offscreen {
+    left: 100%;
+    opacity: 1;
+}
+
+.slideright-prepare-offscreen {
+    left: -100%;
+    opacity: 1;
+}
+
+.crossfade-prepare-offscreen {
+    opacity: 0;
+    z-index: 2;
+}
+
+/*
+ * The onscreen div is in its normal position, fully opaque.
+ */
+.onscreen {
+    left: 0%;
+    z-index: 2;
+    opacity: 1;
+    transition: 350ms ease-out;
+    transition-property: left, opacity;
+}
+
+/*
+ * Unlike the "prepare" classes, the "offscreen" divs DO need to animate.
+ * They end up to the left, right, and original position, respectively.
+ * Note that the cross-faded offscreen div should be transparent and below
+ * the onscreen div.
+ */
+.slideleft-offscreen {
+    left: -100%;
+    transition: left 350ms ease-out;
+}
+
+.slideright-offscreen {
+    left: 100%;
+    transition: left 350ms ease-out;
+}
+
+.crossfade-offscreen {
+    opacity: 0;
+    z-index: 1;
+    transition: opacity 350ms ease-out;
+}

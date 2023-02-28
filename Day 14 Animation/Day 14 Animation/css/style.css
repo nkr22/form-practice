@@ -1,0 +1,75 @@
+/* Recommended by Google for responsive designs to avoid scroll bars on images */
+img {
+    max-width: 100%;
+    display: block;
+}
+
+/* Put CSS that is for all screens here */
+body {
+    padding: 0;
+    margin: 16px;
+}
+
+.container {
+    position: relative;
+    width: 300px;
+    height: 500px;
+}
+
+.map {
+    background-color: rgba(253, 168, 82, 0.9);
+    position: absolute;
+    left: 316px;
+    top: 1em;
+    /* The width/height of this div need to be at least as big as
+        .container so it hides the div we're going to animate in
+        from the right. */
+    width: 800px;
+    height: 500px;
+    z-index: 3;
+}
+
+.chapter {
+    background-color: #eee;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    height: 100%;
+}
+
+#chapter1 {
+    background-color: lightskyblue;
+}
+
+#chapter2 {
+    background-color: cadetblue;
+}
+
+.page {
+    display: flex;
+}
+
+.box-demo {
+    color: white;
+    background-color: gray;
+}
+
+#clickme {
+    position: absolute;
+    width: 150px;
+    height: 100px;
+    background-color: #eee;
+    transition: 700ms;
+    transition-timing-function: ease-in-out;
+    z-index: 10;
+    text-align: center;
+    padding-top: 50px;
+}
+
+@media (max-width: 600px) {
+    /* Put CSS that is only for small screens here */
+}
+
+@media (min-width: 601px) {
+    /* Put CSS that is only for large screens here */
+}

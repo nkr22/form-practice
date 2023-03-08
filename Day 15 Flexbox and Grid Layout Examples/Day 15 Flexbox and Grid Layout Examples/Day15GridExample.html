@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        body {
+            display: grid;
+            grid-template-columns: 30% auto;
+            grid-template-rows: 3em auto;
+            grid-template-areas:
+                "header header"
+                "nav article";
+            background-color: yellow;
+            height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        header {
+            grid-area: header;
+            background-color: #cfc;
+        }
+
+        nav {
+            grid-area: nav;
+            background-color: #fcc;
+            position: relative;
+            overflow: hidden;
+        }
+
+        article {
+            grid-area: article;
+            background-color: #ccf;
+        }
+
+        #box1 {
+            position: absolute;
+            left: 25px;
+            top: 50px;
+            display: block;
+            color: white;
+            background-color: red;
+            width: 8em;
+            height: 8em;
+        }
+
+        #box2 {
+            position: absolute;
+            left: 75px;
+            top: 150px;
+            display: block;
+            color: white;
+            background-color: blue;
+            width: 8em;
+            height: 8em;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                grid-template-columns: auto;
+                grid-template-rows: 2.5em auto 25%;
+                grid-template-areas:
+                    "header"
+                    "article"
+                    "nav";
+            }
+        }
+    </style>
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"></script>
+</head>
+<body>
+    <header>Header</header>
+    <article>Right content</article>
+    <nav>
+        Left navigation
+        <div id="box1">Click me.</div>
+        <div id="box2">Click me.</div>
+    </nav>
+    <script type="text/javascript">
+        $("#box1").click(() => {
+            $("#box1").animate(
+                {left: "+=50px"},
+                350,
+                () => { $("#box1").text("You have clicked."); }
+            );
+            $("#box2").animate({top: "+=50px"});
+            $("#box1").text("Click.");
+        });
+        $("#box2").click(() => {
+            $("#box1").animate({left: "-=50px"});
+            $("#box2").animate({top: "-=50px"});
+        });
+    </script>
+</body>
+</html>

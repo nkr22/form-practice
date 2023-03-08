@@ -16,7 +16,7 @@
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
         />
         <link
-            href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Darker+Grotesque:wght@500&family=Montserrat:wght@300&family=Pacifico&family=Quicksand:wght@300;400&family=Rubik+Bubbles&display=swap"
+            href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Darker+Grotesque:wght@500&family=Edu+VIC+WA+NT+Beginner:wght@500&family=Montserrat:wght@300&family=Pacifico&family=Quicksand:wght@300;400&family=Rubik+Bubbles&display=swap"
             rel="stylesheet"
         />
         <link
@@ -34,6 +34,7 @@
             defer
             src="https://unpkg.com/@googlemaps/markerwithlabel/dist/index.min.js"
         ></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     </head>
     <body>
         <header id="header">
@@ -47,20 +48,28 @@
             </div>
         </header>
         <div id="content">
-            <div class="row">
-                <div id="navigatorouter" class="col-5">
-                    <div class="row">
-                        <div id="crumbs" class="col-12"></div>
+            <div class="scripmapcontainer">
+                <div id="navigatorouter">
+                    <div id="crumbcontainer">
+                        <div
+                            class="crumbs"
+                            id="crumbs1"
+                            style="text-align: center"
+                        ></div>
+                        <div
+                            class="crumbs"
+                            id="crumbs2"
+                            style="text-align: center"
+                        ></div>
                     </div>
-                    <div class="row">
+                    <div id="chaptercontainer">
                         <div id="navigator" class="col-12">
-                            <div id="books"></div>
-                            <div class="chapter onscreen" id="chapter1"></div>
-                            <div class="chapter" id="chapter2"></div>
+                            <div class="chapter" id="chapter1"></div>
+                            <div class="chapter onscreen" id="chapter2"></div>
                         </div>
                     </div>
                 </div>
-                <div id="map" class="col-7">Map</div>
+                <div id="map">Map</div>
             </div>
         </div>
 

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Flexbox Example 2</title>
+    <style type="text/css">
+        html, body {
+            /* Ensure that we fill the viewport fully */
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            /* We'll flex the header above the content area */
+            display: flex;
+            flex-flow: column;
+            background-color: yellow;
+        }
+
+        header {
+            /* Our basis is 56px and we don't want to grow or shrink */
+            flex: 0 0 56px;
+            background-color: #fdd9b5;
+        }
+
+        .container {
+            /* Our basis is whatever amount of space is available, and we're happy to grow or shrink */
+            flex: 1 1 auto;
+
+            display: flex;
+            flex-flow: row;
+            background-color: blue;
+        }
+
+        .container > article {
+            /* We want a majority of the width, and we're eager to grow, but we're willing to shrink some */
+            flex: 3 1 70%;
+
+            /* Range between 425 and 550px in width */
+            min-width: 425px;
+            max-width: 550px;
+            background-color: #cfc;
+        }
+
+        .container > aside {
+            /* We always want to be exactly 250px */
+            flex: 0 0 250px;
+
+            background-color: #fcf;
+        }
+
+        .pad-article {
+            flex: 1 1 auto;
+            background-color: #cff;
+        }
+    </style>
+</head>
+<body>
+    <header>header</header>
+    <div class="container">
+        <div class="pad-article">pad 1</div>
+        <article>article</article>
+        <div class="pad-article">pad 2</div>
+        <aside>aside</aside>
+    </div>
+
+    <script type="text/javascript">
+        const header = document.getElementsByTagName("header")[0];
+        const aside = document.getElementsByTagName("aside")[0];
+        let visible = true;
+
+        header.addEventListener("click", () => {
+            visible = !visible;
+            aside.style.display = (visible) ? "block" : "none";
+        });
+    </script>
+</body>
+</html>

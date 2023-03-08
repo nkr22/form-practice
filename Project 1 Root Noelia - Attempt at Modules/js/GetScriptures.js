@@ -2,6 +2,7 @@
 import { setupMarkers } from "./MapApi.js";
 import breadcrumbs from "./Breadcrumbs.js";
 import { showButtons } from "./DisplayChapter.js";
+import { animateToNewContent } from "./Animations.js";
 
 //variables
 let books;
@@ -70,11 +71,15 @@ const cacheBooks = function (callback) {
         volume.books = volumeBooks;
     });
 
+    Object.freeze(books);
+    console.log(books);
+    Object.freeze(volumes);
+    console.log(volumes);
+
     if (typeof callback === "function") {
         callback();
     }
 };
-//clear the markers from the map
 
 //intialize all the variables to be able to access volumes and books later
 const init = function (callback) {
@@ -93,8 +98,13 @@ const init = function (callback) {
     });
 };
 // show the text for a certain chapter
-const showText = function (volume, book, chapter) {
-    const myDiv = document.querySelector(".chapter.onscreen");
+const showText = function (volume, book, chapter, animationType) {
+    //make animation a 4th parameter
+    const myDiv =
+        document.querySelector(".chapter.crossfade-offscreen") ||
+        document.querySelector(".chapter.slideleft-offscreen") ||
+        document.querySelector(".chapter.slideright-offscreen") ||
+        document.querySelector(".chapter");
     myDiv.style.textAlign = "left";
     myDiv.innerHTML = "";
 
@@ -114,6 +124,8 @@ const showText = function (volume, book, chapter) {
     });
 
     showButtons(book, chapter);
+    animateToNewContent(animationType);
+    document.querySelector("#navigator").scrollTop = 0;
 };
 
 export { init, books, volumes, showText, text };

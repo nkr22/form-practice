@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Flexbox Example 1</title>
+    <style type="text/css">
+        html, body {
+            /* Ensure that we fill the viewport fully */
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            /* We'll flex the header above the content area */
+            display: flex;
+            flex-flow: column;
+            background-color: yellow;
+        }
+
+        header {
+            /* Our basis is 56px and we don't want to grow or shrink */
+            flex: 0 0 56px;
+            background-color: #fdd9b5;
+        }
+
+        .container {
+            /* Our basis is whatever amount of space is available, and we're happy to grow or shrink */
+            flex: 1 1 auto;
+
+            /* We're in turn another flex container */
+            display: flex;
+            flex-flow: row;
+            background-color: blue;
+        }
+
+        .container > article {
+            /* The article likes to grow, doesn't much like to shrink, wants to be about 70% wide */
+            flex: 3 1 70%;
+            order: 2;
+            background-color: #cfc;
+        }
+
+        .container > nav {
+            /* The nav grows at a third the rate of the aritcle but readily shrinks */
+            flex: 1 6 30%;
+
+            /* This gives the min/max widths specified in the problem description */
+            min-width: 200px;
+            max-width: 375px;
+            background-color: #fcf;
+        }
+
+        @media screen and (max-width: 640px) {
+            .container {
+                /* For small displays, go vertical */
+                flex-flow: column;
+            }
+
+            .container > article, .container > nav {
+                /* Display flex items in their natural order */
+                order: 0;
+            }
+
+            .container > nav {
+                /* We also need to replace the nav's min/max width properties */
+                min-width: 100%;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>header</header>
+    <div class="container">
+        <article>article</article>
+        <nav>nav</nav>
+    </div>
+</body>
+</html>

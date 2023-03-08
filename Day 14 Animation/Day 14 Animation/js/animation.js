@@ -12,7 +12,9 @@ let count = 1;
 
 // Helper methods
 
-const animateToNewContent = function (animationType = ANIMATION_TYPE_CROSSFADE) {
+const animateToNewContent = function (
+    animationType = ANIMATION_TYPE_CROSSFADE
+) {
     prepareToAnimate(animationType);
     performAnimation(animationType);
     swapDivs();

@@ -1,8 +1,9 @@
 //imports
 import { resetMap } from "./MapApi.js";
 import { showText } from "./GetScriptures.js";
-import { volumes, books } from "./GetScriptures.js";
+import { volumes } from "./GetScriptures.js";
 import breadcrumbs from "./Breadcrumbs.js";
+import { animateToNewContent } from "./Animations.js";
 
 //what happens when the hash changes
 const onHashChanged = function () {
@@ -16,6 +17,7 @@ const onHashChanged = function () {
     ) {
         //hash for home screen
         showVolumes();
+
         return;
     }
     // Trim the leading “#” and then split the hash based on colons (“:”)
@@ -28,12 +30,13 @@ const onHashChanged = function () {
         // But if the volume ID is < 1 or > 5, it’s invalid, so navigate to “home”
         if (Number(splitString[0]) < 1 || Number(splitString[0]) > 5) {
             //hash for home screen
-            window.location.hash = "";
+            showVolumes();
             return;
         }
         //hash for a volume
         else {
             showBooks(volumes[splitString[0] - 1]);
+
             return;
         }
     }
@@ -48,7 +51,8 @@ const onHashChanged = function () {
             Number(splitString[1]) >
                 Number(volumes[splitString[0] - 1].maxBookId)
         ) {
-            window.location.hash = "";
+            // window.location.hash = "";
+            showVolumes();
             return;
         }
         // If we have two ID’s, it’s a volume and book, so navigate to that book’s list
@@ -63,8 +67,10 @@ const onHashChanged = function () {
                 volumes[splitString[0] - 1].books.filter(function (book) {
                     return Number(book.id) === Number(splitString[1]);
                 }),
-                ""
+                "",
+                "crossfade"
             );
+
             return;
         } else {
             showChapters(
@@ -91,35 +97,74 @@ const onHashChanged = function () {
             Number(splitString[2]) > Number(passbook[0].numChapters) ||
             Number(splitString[2]) < 0
         ) {
-            window.location.hash = "";
+            // window.location.hash = "";
+            showVolumes();
             return;
         }
         if (
             Number(splitString[2]) === 0 ||
-            Number(splitString[2]) === "undefined"
+            Number(splitString[2]) === undefined
         ) {
             showText(
                 volumes[splitString[0] - 1],
                 volumes[splitString[0] - 1].books.filter(function (book) {
                     return Number(book.id) === Number(splitString[1]);
                 }),
-                0
+                0,
+                "crossfade"
             );
+
             return;
         } else {
             showText(
                 volumes[splitString[0] - 1],
                 passbook,
-                Number(splitString[2])
+                Number(splitString[2]),
+                "crossfade"
             );
+
             return;
+        }
+    }
+    if (splitString.length === 4) {
+        let passbook = volumes[splitString[0] - 1].books.filter(function (
+            book
+        ) {
+            return Number(book.id) === Number(splitString[1]);
+        });
+        if (splitString[3] === "left") {
+            showText(
+                volumes[splitString[0] - 1],
+                passbook,
+                Number(splitString[2]),
+                "slideleft"
+            );
+
+            return;
+        }
+        if (splitString[3] === "right") {
+            showText(
+                volumes[splitString[0] - 1],
+                passbook,
+                Number(splitString[2]),
+                "slideright"
+            );
+
+            return;
+        } else {
+            // window.location.hash = "";
+            showVolumes();
         }
     }
     // If invalid, navigate “home”
 };
 //show the books for a certain volume
 const showBooks = function (volume) {
-    const myDiv = document.querySelector(".chapter.onscreen");
+    const myDiv =
+        document.querySelector(".chapter.crossfade-offscreen") ||
+        document.querySelector(".chapter.slideleft-offscreen") ||
+        document.querySelector(".chapter.slideright-offscreen") ||
+        document.querySelector(".chapter");
     myDiv.innerHTML = "";
     myDiv.style.textAlign = "center";
 
@@ -131,8 +176,8 @@ const showBooks = function (volume) {
         let button = document.createElement("button");
 
         // appending text to button
-        button.innerHTML = vbook.fullName;
-
+        button.innerHTML = vbook.gridName;
+        button.title = vbook.fullName;
         button.className += "col-4 ";
         button.className += "btn btn-primary";
         button.addEventListener("click", function () {
@@ -142,12 +187,18 @@ const showBooks = function (volume) {
         // appending button to div
         myDiv.appendChild(button);
     });
+    animateToNewContent("crossfade");
+    document.querySelector("#chaptercontainer").scrollTop = 0;
     resetMap();
 };
 
 //show all the chapters for a certain book
 const showChapters = function (volume, book) {
-    const myDiv = document.querySelector(".chapter.onscreen");
+    const myDiv =
+        document.querySelector(".chapter.crossfade-offscreen") ||
+        document.querySelector(".chapter.slideleft-offscreen") ||
+        document.querySelector(".chapter.slideright-offscreen") ||
+        document.querySelector(".chapter");
     myDiv.innerHTML = "";
     myDiv.style.textAlign = "center";
 
@@ -173,17 +224,25 @@ const showChapters = function (volume, book) {
         // appending button to div
         myDiv.appendChild(button);
     }
+    animateToNewContent("crossfade");
+    document.querySelector("#chaptercontainer").scrollTop = 0;
     resetMap();
 };
 
 // show the standard works volumes
 const showVolumes = function () {
-    const myDiv = document.querySelector(".chapter.onscreen");
+    const myDiv =
+        document.querySelector(".chapter.crossfade-offscreen") ||
+        document.querySelector(".chapter.slideleft-offscreen") ||
+        document.querySelector(".chapter.slideright-offscreen") ||
+        document.querySelector(".chapter");
 
     //resetting the breadcrumbs and the scriptures tag`
-    document.getElementById("crumbs").innerHTML = "";
+    document.querySelector(".crumbs").innerHTML = "";
     myDiv.innerHTML = "";
     myDiv.style.textAlign = "center";
+
+    breadcrumbs();
 
     volumes.forEach(function (volume) {
         // creating button element
@@ -191,8 +250,8 @@ const showVolumes = function () {
 
         // creating text to be
         //displayed on button
-        let text = document.createTextNode(volume.fullName);
-
+        let text = document.createTextNode(volume.gridName);
+        button.title = volume.fullName;
         // appending text to button
         button.appendChild(text);
         button.className += "col-5 ";
@@ -204,6 +263,8 @@ const showVolumes = function () {
         // appending button to div
         myDiv.appendChild(button);
     });
+    animateToNewContent("crossfade");
+    document.querySelector("#chaptercontainer").scrollTop = 0;
     resetMap();
 };
 

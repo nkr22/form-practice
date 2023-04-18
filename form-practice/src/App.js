@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AboutPage from "./AboutPage";
 import "./App.css";
 import ContactForm from "./ContactForm.js";
@@ -10,7 +10,15 @@ import { ContactContext } from "./ContactData";
 import EditContact from "./EditContact";
 
 function App() {
-    const [contactData, setContactData] = useState([]);
+    const [contactData, setContactData] = useState(() => {
+        const storedContacts = localStorage.getItem("contacts");
+        return storedContacts ? JSON.parse(storedContacts) : [];
+    });
+
+    useEffect(() => {
+        localStorage.setItem("contacts", JSON.stringify(contactData));
+    }, [contactData]);
+
     const addContact = (newContact) => {
         setContactData([...contactData, newContact]);
     };

@@ -1,0 +1,23 @@
+.Home {
+    text-align: center;
+    margin-top: 50px;
+}
+
+.Home h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.Home p {
+    font-size: 24px;
+    color: #555;
+}
+
+.Home button {
+    width: 30%;
+    background-color: forestgreen;
+}
+
+.Home button:hover {
+    background-color: rgb(105, 170, 105);
+}

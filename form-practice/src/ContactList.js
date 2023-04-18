@@ -8,6 +8,14 @@ const ContactCard = ({ contact, handleDelete, handleUpdate }) => {
     return (
         <div key={contact.id} className="contact-card">
             <h3>
+                {contact.favorite ? (
+                    <img
+                        id="star"
+                        title="Favorited Contact"
+                        src="/star.png"></img>
+                ) : (
+                    ""
+                )}
                 {contact.title} {contact.firstName} {contact.lastName}
             </h3>
             <p>Email: {contact.email}</p>

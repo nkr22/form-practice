@@ -34,3 +34,14 @@
 .no-contacts {
     text-align: center;
 }
+
+#star {
+    width: 20px;
+}
+
+.contact-card h3 {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    cursor: pointer;
+}

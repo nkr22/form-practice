@@ -1,0 +1,259 @@
+:root {
+    --duration: 350ms;
+}
+
+.html {
+    min-width: 100%;
+    min-height: 100%;
+    overflow: hidden;
+}
+
+.btn-primary {
+    margin: 5px;
+    height: 75px;
+    border-radius: 1rem !important;
+    letter-spacing: 100%;
+    background-color: steelblue !important;
+    border-color: steelblue !important;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background-color: skyblue !important;
+    color: black !important;
+}
+
+#content,
+.crumbs,
+#map {
+    font-family: "Quicksand", sans-serif;
+}
+
+.title {
+    font-size: x-large;
+    font-weight: 700;
+    flex-grow: 1;
+    justify-content: left;
+    font-family: "Quicksand", sans-serif;
+    font-style: italic;
+}
+
+.subtitle {
+    font-size: medium;
+    font-weight: 500;
+    font-family: "Quicksand", sans-serif;
+}
+
+#centerhead {
+    padding: 15px;
+    text-align: center;
+    background-color: #f6bccf;
+    display: flex;
+}
+
+#header {
+    border: 1px solid lightslategray;
+}
+
+#navigator {
+    padding-top: 5px;
+    position: relative;
+    /* min-height: 30em; */
+}
+
+#crumbcontainer {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    order: 1;
+}
+
+.crumbs {
+    justify-content: center;
+    position: relative;
+    align-items: center;
+    font-size: 1rem;
+    display: flex;
+    font-weight: 700;
+    box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+    margin-bottom: 0.5rem;
+}
+
+.crumbs a {
+    color: rgba(0, 0, 0, 0.726);
+    position: relative;
+    flex: auto;
+    margin: 2px;
+    cursor: pointer;
+}
+
+.crumbs button i {
+    font-size: 1.5em;
+    text-align: flex-start;
+}
+
+.crumbs a:hover {
+    color: gray;
+}
+
+.versesblock li {
+    list-style: none;
+    padding: 0.5rem;
+    padding-left: 0;
+}
+.chapterheading {
+    text-align: center;
+}
+.navheading {
+    text-align: center;
+}
+
+.big {
+    font-size: xx-large;
+}
+
+.arrow {
+    border-radius: 1rem !important;
+    width: max-content;
+    display: flex;
+    justify-content: center;
+}
+
+.arrow:hover {
+    background-color: aquamarine;
+}
+
+/* Define a global transition for all elements */
+
+.slideleft-prepare-offscreen {
+    left: -100%;
+    opacity: 1;
+}
+
+.slideright-prepare-offscreen {
+    left: 100%;
+    opacity: 1;
+}
+
+.crossfade-prepare-offscreen {
+    opacity: 0;
+    z-index: 2;
+}
+
+/*
+* The onscreen div is in its normal position, fully opaque.
+*/
+.onscreen {
+    left: 0;
+    z-index: 2;
+    opacity: 1;
+    transition: var(--duration) ease-out;
+    transition-property: left, opacity;
+}
+
+/*
+* Unlike the "prepare" classes, the "offscreen" divs DO need to animate.
+* They end up to the left, right, and original position, respectively.
+* Note that the cross-faded offscreen div should be transparent and below
+* the onscreen div.
+*/
+
+.slideleft-offscreen {
+    left: 100%;
+    transition: left var(--duration) ease-out;
+}
+
+.slideright-offscreen {
+    left: -100%;
+    transition: left var(--duration) ease-out;
+}
+
+.crossfade-offscreen {
+    opacity: 0;
+    z-index: 1;
+    transition: opacity var(--duration) ease-out;
+}
+
+.chapter {
+    position: absolute;
+    width: 100%;
+    top: 0;
+}
+
+.scripmapcontainer {
+    position: relative;
+    display: flex;
+    flex-flow: row wrap;
+}
+#navigatorouter {
+    position: relative;
+    flex-grow: 1;
+    min-width: 220px;
+    max-width: 440px;
+    flex: 1 1 30%;
+    height: 100%;
+    min-height: 100%;
+    order: 2;
+    display: flex;
+    flex-flow: column;
+    overflow-x: hidden;
+}
+
+#chaptercontainer {
+    order: 2;
+    height: 95vh;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+#map {
+    position: relative;
+    font-size: x-large;
+    font-weight: 300;
+    flex-grow: 2;
+    height: 100vh;
+    z-index: 4;
+    order: 3;
+}
+
+.prepare-bread-offscreen {
+    opacity: 0;
+    z-index: 0;
+}
+
+.bread-onscreen {
+    left: 0;
+    z-index: 4;
+    opacity: 1;
+    transition: 1500ms ease-out;
+    transition-property: left, opacity;
+}
+
+.bread-offscreen {
+    left: 100%;
+    position: absolute;
+    opacity: 0;
+    z-index: 1;
+    transition: opacity 1500ms ease-out;
+}
+
+@media (max-width: 767px) {
+    .scripmapcontainer {
+        flex-flow: column wrap;
+        min-width: 100%;
+        max-width: 100%;
+    }
+
+    #map {
+        max-height: 20em;
+        min-height: 15em;
+        margin: 10px;
+        margin-bottom: 0px;
+        margin-top: 5px;
+    }
+    #navigatorouter {
+        min-width: 100%;
+        max-width: 100%;
+        max-height: 20em;
+    }
+}

@@ -1,0 +1,13 @@
+.App {
+    text-align: center;
+    display: grid;
+    grid-template-columns: auto;
+    grid-template-rows: 4em auto;
+    grid-template-areas: "navbar" "content";
+}
+
+#content {
+    grid-area: content;
+    display: flex;
+    justify-content: center;
+}

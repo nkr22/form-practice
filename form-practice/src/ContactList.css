@@ -1,0 +1,32 @@
+.contact-card {
+    border: solid 2px black;
+    border-radius: 20%;
+    padding: 1em;
+}
+
+.btn-danger {
+    background-color: red;
+    width: 50%;
+    margin: 10px;
+    text-align: center;
+}
+
+.btn-change {
+    background-color: green;
+    width: 50%;
+    text-align: center;
+}
+
+.btn-change:hover {
+    background-color: rgb(78, 133, 78);
+}
+
+.btn-danger:hover {
+    background-color: rgb(250, 97, 97);
+}
+
+.contact-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 20px;
+}

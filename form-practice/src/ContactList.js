@@ -28,6 +28,7 @@ const ContactCard = ({ contact, handleDelete, handleUpdate }) => {
     );
 };
 const ContactList = () => {
+    const navigate = useNavigate();
     const { contactData, deleteContact, updateContact } =
         useContext(ContactContext);
     const handleDelete = (id) => {
@@ -36,22 +37,40 @@ const ContactList = () => {
     const handleUpdate = (editedContact) => {
         updateContact(editedContact);
     };
-    return (
-        <div>
-            <h2>Contacts</h2>
-            <div className="contact-list">
-                {contactData.map((contact) => (
-                    <>
-                        <ContactCard
-                            contact={contact}
-                            handleDelete={handleDelete}
-                            handleUpdate={handleUpdate}
-                        />
-                    </>
-                ))}
+
+    if (contactData.length > 0) {
+        return (
+            <div>
+                <h2>Contacts</h2>
+                <div className="contact-list">
+                    {contactData.map((contact) => (
+                        <>
+                            <ContactCard
+                                contact={contact}
+                                handleDelete={handleDelete}
+                                handleUpdate={handleUpdate}
+                            />
+                        </>
+                    ))}
+                </div>
             </div>
-        </div>
-    );
+        );
+    } else {
+        return (
+            <div>
+                <h2>Contacts</h2>
+                <div className="no-contacts">
+                    No contacts currently on record
+                    <button
+                        onClick={() => {
+                            navigate(`/addContact`);
+                        }}>
+                        Add a Contact
+                    </button>
+                </div>
+            </div>
+        );
+    }
 };
 
 export default ContactList;

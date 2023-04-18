@@ -30,3 +30,7 @@
     grid-template-columns: repeat(3, 1fr);
     grid-gap: 20px;
 }
+
+.no-contacts {
+    text-align: center;
+}
